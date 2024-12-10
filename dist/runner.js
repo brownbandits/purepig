@@ -7,18 +7,38 @@ document.head.appendChild(gptScript);
 // Create a container for the ad
 const adContainer = document.createElement('div');
 adContainer.id = 'div-gpt-ad-1733637534778-0';
-adContainer.style.cssText = 'min-width: 250px; min-height: 250px; margin: auto; text-align: center;';
-document.body.appendChild(adContainer);
+adContainer.style.cssText = `
+    width: 100%;
+    height: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 99999;
+    background-color: white;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+  `;
+document.body.prepend(adContainer);
 
 // Initialize Google Publisher Tag (GPT) for the ad
-const gptInitScript = document.createElement('script');
+const gptInitScript = document.createElement("script");
 gptInitScript.text = `
   window.googletag = window.googletag || {cmd: []};
   googletag.cmd.push(function() {
     googletag.defineSlot('/22986375450/GB_Image_A_B_300*250', [[250, 360], [300, 250]], 'div-gpt-ad-1733637534778-0')
       .addService(googletag.pubads());
     googletag.pubads().enableSingleRequest();
+    googletag.pubads().collapseEmptyDivs(); // Collapse the ad container if no ad is loaded
     googletag.enableServices();
+
+    // Add event listener for ad rendering
+    googletag.pubads().addEventListener('slotRenderEnded', function(event) {
+      if (event.slot.getSlotElementId() === 'div-gpt-ad-1733637534778-0') {
+        const adHeight = adContainer.offsetHeight;
+        document.body.style.paddingTop = adHeight > 0 ? \`\${adHeight}px\` : '0px';
+      }
+    });
   });
 `;
 document.head.appendChild(gptInitScript);
